@@ -1,4 +1,5 @@
 const Bootcamp = require('../models/Bootcamp');
+const ErrorResponse = require('../utils/errorResponse');
 
 // @desc     Get all bootcamps
 // @route    GET /api/v1/bootcamps
@@ -10,8 +11,7 @@ exports.getBootcamps = async (req, res, next) => {
       .status(200)
       .json({ success: true, count: bootcamps.length, data: bootcamps });
   } catch (err) {
-    console.log(err.message.red);
-    res.status(400).json({ success: false, error: err.message });
+    next(err);
   }
 };
 
@@ -23,18 +23,14 @@ exports.getBootcamp = async (req, res, next) => {
     const bootcamp = await Bootcamp.findById(req.params.id);
 
     if (!bootcamp) {
-      console.log(`no bootcamp with ID ${req.params.id}`.red);
-      return res.status(404).json({
-        success: false,
-        error: `no bootcamp with ID ${req.params.id}`,
-      });
+      return next(
+        new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404) // it is a formatted id but not in DB
+      );
     }
+
     res.status(200).json({ success: true, data: bootcamp });
   } catch (err) {
-    console.log(`no bootcamp with ID ${req.params.id}`.red);
-    res
-      .status(404)
-      .json({ success: false, error: `no bootcamp with ID ${req.params.id}` });
+    next(err);
   }
 };
 
@@ -50,8 +46,7 @@ exports.createBootcamp = async (req, res, next) => {
       data: bootcamp,
     });
   } catch (err) {
-    console.log(err.message.red);
-    res.status(400).json({ success: false, error: err.message });
+    next(err);
   }
 };
 
@@ -66,20 +61,14 @@ exports.updateBootcamp = async (req, res, next) => {
     });
 
     if (!bootcamp) {
-      console.log(`no bootcamp with ID ${req.params.id}`.red);
-      return res.status(404).json({
-        success: false,
-        error: `no bootcamp with ID ${req.params.id}`,
-      });
+      return next(
+        new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404) // it is a formatted id but not in DB
+      );
     }
 
     res.status(200).json({ success: true, data: bootcamp });
   } catch (err) {
-    console.log(`no bootcamp with ID ${req.params.id}`.red);
-    return res.status(404).json({
-      success: false,
-      error: `no bootcamp with ID ${req.params.id}`,
-    });
+    next(err);
   }
 };
 
@@ -94,19 +83,13 @@ exports.deleteBootcamp = async (req, res, next) => {
     });
 
     if (!bootcamp) {
-      console.log(`no bootcamp with ID ${req.params.id}`.red);
-      return res.status(404).json({
-        success: false,
-        error: `no bootcamp with ID ${req.params.id}`,
-      });
+      return next(
+        new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404) // it is a formatted id but not in DB
+      );
     }
 
     res.status(200).json({ success: true, data: {} });
   } catch (err) {
-    console.log(`no bootcamp with ID ${req.params.id}`.red);
-    return res.status(404).json({
-      success: false,
-      error: `no bootcamp with ID ${req.params.id}`,
-    });
+    next(err);
   }
 };
