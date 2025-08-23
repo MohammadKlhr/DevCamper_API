@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const colors = require('colors');
+const qs = require('qs');
 const errorHandler = require('./middleware/error')
 const connectDB = require('./config/db');
 
@@ -18,6 +19,9 @@ const app = express();
 
 // Body Parser  // enabling req.body
 app.use(express.json());
+
+// enabling req.query in correct format
+app.set('query parser', str => qs.parse(str));
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
