@@ -8,6 +8,7 @@ dotenv.config({ path: './config/config.env' });
 
 // Load models
 const Bootcamp = require('./models/Bootcamp');
+const Course = require('./models/Course');
 
 // Connect to DB
 mongoose.connect(process.env.MONGO_URI);
@@ -15,6 +16,10 @@ mongoose.connect(process.env.MONGO_URI);
 //Read JSON Files
 const bootcamps = JSON.parse(
   fs.readFileSync(`${__dirname}/_data/bootcamps.json`, 'utf-8')
+);
+
+const courses = JSON.parse(
+  fs.readFileSync(`${__dirname}/_data/courses.json`, 'utf-8')
 );
 
 // Helper: Sleep
@@ -35,9 +40,10 @@ const importData = async () => {
     const chunks = chunkArray(bootcamps, 2); // split into groups of 2
     for (const chunk of chunks) {
       await Bootcamp.create(chunk);
-      console.log(`Inserted ${chunk.length} records...`.green);
+      console.log(`Inserted ${chunk.length} records to bootcamps...`.green);
       await sleep(1000); // pause 1 second between each batch
     }
+    await Course.create(courses);
     console.log('Data Imported...'.green.inverse);
     process.exit();
   } catch (err) {
@@ -50,6 +56,7 @@ const importData = async () => {
 const deleteData = async () => {
   try {
     await Bootcamp.deleteMany();
+    await Course.deleteMany();
     console.log('Data Destroyed...'.red.inverse);
     process.exit();
   } catch (err) {
