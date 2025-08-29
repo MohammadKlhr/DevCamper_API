@@ -1,9 +1,11 @@
+const path = require('path')
 const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const colors = require('colors');
+const fileupload = require('express-fileupload');
 const qs = require('qs');
-const errorHandler = require('./middleware/error')
+const errorHandler = require('./middleware/error');
 const connectDB = require('./config/db');
 
 // Load env vars
@@ -22,7 +24,13 @@ const app = express();
 app.use(express.json());
 
 // enabling req.query in correct format
-app.set('query parser', str => qs.parse(str));
+app.set('query parser', (str) => qs.parse(str));
+
+// File Uploading
+app.use(fileupload());
+
+// Set static folder
+app.use(express.static(path.join(__dirname, 'public')))
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
@@ -33,7 +41,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/api/v1/bootcamps', bootcamps);
 app.use('/api/v1/courses', courses);
 
-app.use(errorHandler)
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 

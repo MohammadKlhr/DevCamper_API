@@ -8,25 +8,17 @@ const Bootcamp = require('../models/Bootcamp');
 // @route           GET /api/v1/bootcamps/:bootcampId/courses
 // @access          Public
 exports.getCourses = asyncHandler(async (req, res, next) => {
-  let query;
-
   if (req.params.bootcampId) {
-    query = Course.find({ bootcamp: req.params.bootcampId });
-  } else {
-    // query = Course.find().populate('bootcamp');
-    query = Course.find().populate({
-      path: 'bootcamp',
-      select: 'name description',
+    const courses = await Course.find({ bootcamp: req.params.bootcampId });
+
+    return res.status(200).json({
+      success: true,
+      count: courses.length,
+      data: courses,
     });
+  } else {
+    res.status(200).json(res.advancedResults);
   }
-
-  const courses = await query;
-
-  res.status(200).json({
-    success: true,
-    count: courses.length,
-    data: courses,
-  });
 });
 
 // @desc            Get single course
@@ -82,14 +74,11 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
   const course = await Course.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
-  })
+  });
 
   if (!course) {
     return next(
-      new ErrorResponse(
-        `No course with the id of ${req.params.id}`,
-        404
-      )
+      new ErrorResponse(`No course with the id of ${req.params.id}`, 404)
     );
   }
 
@@ -103,18 +92,15 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
 // @route           DELETE /api/v1/courses/:id
 // @access          Private
 exports.deleteCourse = asyncHandler(async (req, res, next) => {
-  const course = await Course.findById(req.params.id)
+  const course = await Course.findById(req.params.id);
 
   if (!course) {
     return next(
-      new ErrorResponse(
-        `No course with the id of ${req.params.id}`,
-        404
-      )
+      new ErrorResponse(`No course with the id of ${req.params.id}`, 404)
     );
   }
 
-  await course.deleteOne()
+  await course.deleteOne();
 
   res.status(200).json({
     success: true,
