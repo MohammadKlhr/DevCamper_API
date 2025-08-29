@@ -43,7 +43,7 @@ const importData = async () => {
       console.log(`Inserted ${chunk.length} records to bootcamps...`.green);
       await sleep(1000); // pause 1 second between each batch
     }
-    await Course.create(courses);
+    // await Course.create(courses);
     console.log('Data Imported...'.green.inverse);
     process.exit();
   } catch (err) {
