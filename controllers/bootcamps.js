@@ -27,7 +27,22 @@ exports.getBootcamp = asyncHandler(async (req, res, next) => {
 // @route           POST /api/v1/bootcamps
 // @access          Private
 exports.createBootcamp = asyncHandler(async (req, res, next) => {
-  // console.log(req.body);  // after adding body parser as middleware in the server.js file, this line will return the body of the request
+  // Add user to req.body
+  req.body.user = req.user.id;
+
+  // Check for published bootcamp
+  const publishedBootcamp = await Bootcamp.findOne({ user: req.user.id });
+
+  // If the user is not an admin, they can only add one bootcamp
+  if (publishedBootcamp && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `The user with ID ${req.user.id} has already published a bootcamp`,
+        400
+      )
+    );
+  }
+
   const bootcamp = await Bootcamp.create(req.body);
   res.status(201).json({
     success: true,
@@ -74,7 +89,7 @@ exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
   const { lng, lat, distance } = req.params;
 
   // Measuring the radius in radians
-  // Divide dist by radius of Earth 
+  // Divide dist by radius of Earth
   // Earth Radius = 3_963 mi OR 6_378 km
   const radius = distance / 3963;
 
