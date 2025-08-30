@@ -36,7 +36,7 @@ const UserSchema = new mongoose.Schema({
 });
 
 // Encrypt password using bcrypt
-UserSchema.pre('save', async function (next) {
+UserSchema.pre('save', async function () {  // async func middelswares do not need calling next() at the end
   const salt = await bcrypt.genSalt(10); //the Higher number, the more secure but also more computationally expensive on the server - 10 is recommended
   this.password = await bcrypt.hash(this.password, salt);
 });
