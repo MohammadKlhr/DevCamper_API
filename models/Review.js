@@ -5,7 +5,7 @@ const ReviewSchema = new mongoose.Schema({
     type: String,
     trim: true,
     required: [true, 'Please add a title for review'],
-    maxlength: 100
+    maxLength: 100,
   },
   text: {
     type: String,
@@ -30,7 +30,10 @@ const ReviewSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: 'User',
     required: true,
-  }
+  },
 });
+
+// Prevent user from submitting more than one review per bootcamp
+ReviewSchema.index({ bootcamp: 1, user: 1 }, { unique: true });
 
 module.exports = mongoose.model('Review', ReviewSchema);
