@@ -6,6 +6,7 @@ const colors = require('colors');
 const fileupload = require('express-fileupload');
 const cookieParser = require('cookie-parser');
 const qs = require('qs');
+const mongoSanitize = require('express-mongo-sanitize');
 const errorHandler = require('./middleware/error');
 const connectDB = require('./config/db');
 
@@ -26,6 +27,14 @@ const app = express();
 
 // Body Parser  // enabling req.body
 app.use(express.json());
+
+// Sanitize data
+app.use((req, res, next) => {
+  if (req.body) req.body = mongoSanitize.sanitize(req.body);
+  if (req.params) req.params = mongoSanitize.sanitize(req.params);
+  if (req.query) Object.assign(req.query, mongoSanitize.sanitize(req.query));
+  next();
+});
 
 // enabling req.query in correct format
 app.set('query parser', (str) => qs.parse(str));
