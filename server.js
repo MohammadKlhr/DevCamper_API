@@ -7,6 +7,8 @@ const fileupload = require('express-fileupload');
 const cookieParser = require('cookie-parser');
 const qs = require('qs');
 const mongoSanitize = require('express-mongo-sanitize');
+const helmet = require('helmet');
+const xssSanitize = require('./middleware/xssSanitize');
 const errorHandler = require('./middleware/error');
 const connectDB = require('./config/db');
 
@@ -28,13 +30,19 @@ const app = express();
 // Body Parser  // enabling req.body
 app.use(express.json());
 
-// Sanitize data
+// Sanitize data (for NoSQL DB)
 app.use((req, res, next) => {
   if (req.body) req.body = mongoSanitize.sanitize(req.body);
   if (req.params) req.params = mongoSanitize.sanitize(req.params);
   if (req.query) Object.assign(req.query, mongoSanitize.sanitize(req.query));
   next();
 });
+
+// Set security headers
+app.use(helmet());
+
+// Prevent XSS attacks
+app.use(xssSanitize());
 
 // enabling req.query in correct format
 app.set('query parser', (str) => qs.parse(str));
