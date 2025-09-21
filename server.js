@@ -9,6 +9,9 @@ const qs = require('qs');
 const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
 const xssSanitize = require('xss-sanitize');
+const rateLimit = require('express-rate-limit');
+const hppCustom = require('./middleware/hppCustom');
+const cors = require('cors');
 const errorHandler = require('./middleware/error');
 const connectDB = require('./config/db');
 
@@ -44,7 +47,21 @@ app.use(helmet());
 // Prevent XSS attacks
 app.use(xssSanitize());
 
-// enabling req.query in correct format
+// Rate Limiting
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 mins
+  max: 100,
+});
+// maximum 100 reqs in 10 mins
+app.use(limiter);
+
+// Prevent http param pollution
+app.use(hppCustom());
+
+// Enabling CORS
+app.use(cors())
+
+// Enabling req.query in correct format
 app.set('query parser', (str) => qs.parse(str));
 
 // Cookie Parser
