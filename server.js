@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser');
 const qs = require('qs');
 const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
-const xssSanitize = require('./middleware/xssSanitize');
+const xssSanitize = require('xss-sanitize');
 const errorHandler = require('./middleware/error');
 const connectDB = require('./config/db');
 
