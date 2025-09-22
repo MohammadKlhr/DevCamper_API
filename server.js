@@ -10,7 +10,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
 const xssSanitize = require('xss-sanitize');
 const rateLimit = require('express-rate-limit');
-const hppCustom = require('./middleware/hppCustom');
+const hpp = require('hpp-clean');
 const cors = require('cors');
 const errorHandler = require('./middleware/error');
 const connectDB = require('./config/db');
@@ -56,7 +56,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Prevent http param pollution
-app.use(hppCustom());
+app.use(hpp());
 
 // Enabling CORS
 app.use(cors())
