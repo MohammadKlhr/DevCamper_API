@@ -1,5 +1,7 @@
 const express = require('express');
 
+const xssSanitize = require('xss-sanitize');
+
 const {
   getBootcamps,
   getBootcamp,
@@ -22,10 +24,12 @@ const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
 
 // Re-route into other resource routers
-router.use('/:bootcampId/courses', courseRouter);
-router.use('/:bootcampId/reviews', reviewRouter);
+router.use('/:bootcampId/courses', xssSanitize.paramSanitize(), courseRouter);
+router.use('/:bootcampId/reviews', xssSanitize.paramSanitize(), reviewRouter);
 
-router.route('/radius/:lng/:lat/:distance').get(getBootcampsInRadius);
+router
+  .route('/radius/:lng/:lat/:distance')
+  .get(xssSanitize.paramSanitize(), getBootcampsInRadius);
 
 router
   .route('/')
@@ -34,12 +38,27 @@ router
 
 router
   .route('/:id')
-  .get(getBootcamp)
-  .put(protect, authorize('publisher', 'admin'), updateBootcamp)
-  .delete(protect, authorize('publisher', 'admin'), deleteBootcamp);
+  .get(xssSanitize.paramSanitize(), getBootcamp)
+  .put(
+    xssSanitize.paramSanitize(),
+    protect,
+    authorize('publisher', 'admin'),
+    updateBootcamp
+  )
+  .delete(
+    xssSanitize.paramSanitize(),
+    protect,
+    authorize('publisher', 'admin'),
+    deleteBootcamp
+  );
 
 router
   .route('/:id/photo')
-  .put(protect, authorize('publisher', 'admin'), bootcampPhotoUpload);
+  .put(
+    xssSanitize.paramSanitize(),
+    protect,
+    authorize('publisher', 'admin'),
+    bootcampPhotoUpload
+  );
 
 module.exports = router;

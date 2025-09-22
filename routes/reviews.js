@@ -1,5 +1,7 @@
 const express = require('express');
 
+const xssSanitize = require('xss-sanitize');
+
 const {
   getReviews,
   getReview,
@@ -25,8 +27,18 @@ router
 
 router
   .route('/:id')
-  .get(getReview)
-  .put(protect, authorize('user', 'admin'), updateReview)
-  .delete(protect, authorize('user', 'admin'), deleteReview);
+  .get(xssSanitize.paramSanitize(), getReview)
+  .put(
+    xssSanitize.paramSanitize(),
+    protect,
+    authorize('user', 'admin'),
+    updateReview
+  )
+  .delete(
+    xssSanitize.paramSanitize(),
+    protect,
+    authorize('user', 'admin'),
+    deleteReview
+  );
 
 module.exports = router;
